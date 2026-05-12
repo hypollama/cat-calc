@@ -44,12 +44,7 @@
     text-align: center;
   }
   .paw { font-size: 42px; display: block; margin-bottom: 6px; }
-  .header h1 {
-    font-family: 'Fredoka One', cursive;
-    font-size: 26px;
-    color: white;
-    letter-spacing: 0.5px;
-  }
+  .header h1 { font-family: 'Fredoka One', cursive; font-size: 26px; color: white; letter-spacing: 0.5px; }
   .header p { color: rgba(255,255,255,0.88); font-size: 13px; font-weight: 600; margin-top: 4px; }
   .body { padding: 28px 24px; }
   label {
@@ -103,7 +98,7 @@
   }
   @keyframes popIn {
     from { transform: scale(0.85); opacity: 0; }
-    to   { transform: scale(1);    opacity: 1; }
+    to   { transform: scale(1); opacity: 1; }
   }
   .result-box.show { display: block; }
   .result-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--green); margin-bottom: 8px; }
@@ -120,6 +115,52 @@
   .eq-chip { display: inline-block; background: var(--orange-light); border-radius: 8px; padding: 3px 10px; font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange-dark); margin-top: 5px; }
   .error-box { margin-top: 14px; background: #fff0f0; border: 2px solid #ffc0c0; border-radius: 14px; padding: 12px 16px; color: #c0392b; font-size: 13px; font-weight: 700; text-align: center; display: none; }
   .error-box.show { display: block; }
+
+  /* Settings */
+  .settings {
+    background: #f9f4ef;
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 22px;
+  }
+  .settings-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .settings-row label {
+    margin: 0;
+    font-size: 13px;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text);
+    flex: 1;
+    font-weight: 700;
+  }
+  .settings-row input {
+    width: 90px;
+    padding: 10px 12px;
+    font-size: 20px;
+    border-radius: 12px;
+    flex: none;
+  }
+  .saved-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  .saved-badge.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -130,12 +171,22 @@
     <p>Daily portion helper</p>
   </div>
   <div class="body">
+
+    <div class="settings">
+      <div class="settings-title">⚙️ Settings</div>
+      <div class="settings-row">
+        <label for="yInput">Y value (currently <span id="yDisplay">29</span>)</label>
+        <input type="number" id="yInput" placeholder="29" inputmode="numeric">
+        <span class="saved-badge" id="savedBadge">✅ Saved!</span>
+      </div>
+    </div>
+
     <label for="xInput">Total food amount (grams)</label>
     <div class="input-row">
-      <input type="number" id="xInput" placeholder="e.g. 300" inputmode="numeric" min="30" max="9999">
+      <input type="number" id="xInput" placeholder="e.g. 300" inputmode="numeric" min="1" max="9999">
       <button class="calc" onclick="calculate()" title="Calculate">🐱</button>
     </div>
-    <div class="error-box" id="errorBox">⚠️ Please enter a number greater than 29</div>
+    <div class="error-box" id="errorBox">⚠️ Enter a number bigger than your Y value</div>
     <div class="result-box" id="resultBox">
       <div class="result-label">✅ Give your cat</div>
       <div class="result-number" id="resultNum">—</div>
@@ -144,7 +195,7 @@
     <div class="steps" id="stepsBox">
       <div class="steps-title">🔢 How it was calculated</div>
       <div class="step"><span>Starting amount (X)</span><span class="val" id="s0">—</span></div>
-      <div class="step"><span>X − 29</span><span class="val" id="s1">—</span></div>
+      <div class="step"><span>X − Y</span><span class="val" id="s1">—</span></div>
       <div class="step"><span>÷ 3 (portion to subtract)</span><span class="val" id="s2">—</span></div>
       <div class="step"><span>X − portion</span><span class="val" id="s3">—</span></div>
       <div class="step"><span>− portion again</span><span class="val" id="s4">—</span></div>
@@ -152,7 +203,7 @@
     <div class="divider"></div>
     <div class="equation-info">
       Using your equation<br>
-      <span class="eq-chip">X − 2×((X−29)÷3)</span>
+      <span class="eq-chip">X − 2×((X−Y)÷3)</span>
     </div>
   </div>
 </div>
@@ -160,21 +211,41 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js');
   }
+
+  // Load saved Y on startup
+  let Y = parseFloat(localStorage.getItem('catcalc_y')) || 29;
+  document.getElementById('yInput').value = Y;
+  document.getElementById('yDisplay').textContent = Y;
+
+  // Save Y when changed
+  document.getElementById('yInput').addEventListener('change', () => {
+    const val = parseFloat(document.getElementById('yInput').value);
+    if (!isNaN(val) && val > 0) {
+      Y = val;
+      localStorage.setItem('catcalc_y', Y);
+      document.getElementById('yDisplay').textContent = Y;
+      const badge = document.getElementById('savedBadge');
+      badge.classList.add('show');
+      setTimeout(() => badge.classList.remove('show'), 2000);
+    }
+  });
+
   document.getElementById('xInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') calculate();
   });
+
   function fmt(n) { return Number.isInteger(n) ? n : n.toFixed(2); }
+
   function calculate() {
-    const input = document.getElementById('xInput');
-    const X = parseFloat(input.value);
+    const X = parseFloat(document.getElementById('xInput').value);
     const errorBox = document.getElementById('errorBox');
     const resultBox = document.getElementById('resultBox');
     const stepsBox = document.getElementById('stepsBox');
     errorBox.classList.remove('show');
     resultBox.classList.remove('show');
     stepsBox.classList.remove('show');
-    if (isNaN(X) || X <= 29) { errorBox.classList.add('show'); return; }
-    const step1 = X - 29;
+    if (isNaN(X) || X <= Y) { errorBox.classList.add('show'); return; }
+    const step1 = X - Y;
     const step2 = step1 / 3;
     const step3 = X - step2;
     const step4 = step3 - step2;
