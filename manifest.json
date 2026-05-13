@@ -1,6 +1,6 @@
 {
   "name": "CatCulator",
-  "short_name": "CatCulator",
+  "short_name": "CatCulate",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#fff8f0",
