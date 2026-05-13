@@ -1,6 +1,6 @@
 {
-  "name": "Cat Food Calc",
-  "short_name": "CatCalc",
+  "name": "CatCulator",
+  "short_name": "CatCulator",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#fff8f0",
