@@ -4,163 +4,211 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#ff7b2f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="CatCalc">
+<link rel="apple-touch-icon" href="icon.png">
 <title>🐱 Cat Food Calc</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
-  :root {
-    --bg: #fff8f0;
-    --card: #ffffff;
-    --orange: #ff7b2f;
-    --orange-light: #fff0e6;
-    --orange-dark: #e05a10;
-    --text: #2d2013;
-    --muted: #9a7a60;
-    --green: #4caf7d;
-    --green-light: #e8f7ef;
-    --shadow: 0 4px 24px rgba(255,123,47,0.13);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--bg);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .app {
-    background: var(--card);
-    border-radius: 28px;
-    box-shadow: var(--shadow);
-    width: 100%;
-    max-width: 380px;
-    overflow: hidden;
-  }
-  .header {
-    background: linear-gradient(135deg, var(--orange) 0%, #ffb347 100%);
-    padding: 28px 24px 24px;
-    text-align: center;
-  }
-  .paw { font-size: 42px; display: block; margin-bottom: 6px; }
-  .header h1 { font-family: 'Fredoka One', cursive; font-size: 26px; color: white; letter-spacing: 0.5px; }
-  .header p { color: rgba(255,255,255,0.88); font-size: 13px; font-weight: 600; margin-top: 4px; }
-  .body { padding: 28px 24px; }
-  label {
-    display: block;
-    font-weight: 800;
-    font-size: 14px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-  }
-  .input-row { display: flex; gap: 10px; align-items: stretch; }
-  input[type="number"] {
-    flex: 1;
-    border: 2.5px solid #f0e0d0;
-    border-radius: 16px;
-    padding: 16px 18px;
-    font-size: 28px;
-    font-family: 'Fredoka One', cursive;
-    color: var(--text);
-    background: var(--orange-light);
-    outline: none;
-    transition: border-color 0.2s;
-    width: 100%;
-    -moz-appearance: textfield;
-  }
-  input[type="number"]::-webkit-outer-spin-button,
-  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
-  input[type="number"]:focus { border-color: var(--orange); background: #fff; }
-  button.calc {
-    background: linear-gradient(135deg, var(--orange) 0%, #ffb347 100%);
-    border: none;
-    border-radius: 16px;
-    padding: 0 22px;
-    font-size: 28px;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 4px 12px rgba(255,123,47,0.35);
-    min-width: 64px;
-  }
-  button.calc:active { transform: scale(0.94); }
-  .result-box {
-    margin-top: 22px;
-    background: var(--green-light);
-    border-radius: 20px;
-    padding: 22px 20px;
-    text-align: center;
-    border: 2.5px solid #b8e8cc;
-    display: none;
-    animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes popIn {
-    from { transform: scale(0.85); opacity: 0; }
-    to   { transform: scale(1); opacity: 1; }
-  }
-  .result-box.show { display: block; }
-  .result-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--green); margin-bottom: 8px; }
-  .result-number { font-family: 'Fredoka One', cursive; font-size: 52px; color: #2e7d52; line-height: 1; }
-  .result-unit { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 4px; }
-  .steps { margin-top: 18px; background: #f9f4ef; border-radius: 16px; padding: 16px; display: none; }
-  .steps.show { display: block; }
-  .steps-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
-  .step { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed #e8d8c8; font-size: 14px; color: var(--text); font-weight: 600; }
-  .step:last-child { border-bottom: none; }
-  .step .val { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--orange-dark); }
-  .divider { height: 1px; background: #f0e4d8; margin: 22px 0; }
-  .equation-info { text-align: center; font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.6; }
-  .eq-chip { display: inline-block; background: var(--orange-light); border-radius: 8px; padding: 3px 10px; font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange-dark); margin-top: 5px; }
-  .error-box { margin-top: 14px; background: #fff0f0; border: 2px solid #ffc0c0; border-radius: 14px; padding: 12px 16px; color: #c0392b; font-size: 13px; font-weight: 700; text-align: center; display: none; }
-  .error-box.show { display: block; }
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+:root {
+  --bg: #fff8f0;
+  --card: #ffffff;
+  --orange: #ff7b2f;
+  --orange-light: #fff0e6;
+  --orange-dark: #e05a10;
+  --text: #2d2013;
+  --muted: #9a7a60;
+  --green: #4caf7d;
+  --green-light: #e8f7ef;
+  --blue: #4a90d9;
+  --blue-light: #e8f2fd;
+  --shadow: 0 4px 24px rgba(255,123,47,0.13);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.app {
+  background: var(--card);
+  border-radius: 28px;
+  box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 380px;
+  overflow: hidden;
+}
+.header {
+  background: linear-gradient(135deg, var(--orange) 0%, #ffb347 100%);
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+.paw { font-size: 42px; display: block; margin-bottom: 6px; }
+.header h1 { font-family: 'Fredoka One', cursive; font-size: 26px; color: white; letter-spacing: 0.5px; }
+.header p { color: rgba(255,255,255,0.88); font-size: 13px; font-weight: 600; margin-top: 4px; }
+.body { padding: 28px 24px; }
+label {
+  display: block;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+.input-row { display: flex; gap: 10px; align-items: stretch; }
+input[type="number"] {
+  flex: 1;
+  border: 2.5px solid #f0e0d0;
+  border-radius: 16px;
+  padding: 16px 18px;
+  font-size: 28px;
+  font-family: 'Fredoka One', cursive;
+  color: var(--text);
+  background: var(--orange-light);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+input[type="number"]:focus { border-color: var(--orange); background: #fff; }
+button.calc {
+  background: linear-gradient(135deg, var(--orange) 0%, #ffb347 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 0 22px;
+  font-size: 28px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(255,123,47,0.35);
+  min-width: 64px;
+}
+button.calc:active { transform: scale(0.94); }
 
-  /* Settings */
-  .settings {
-    background: #f9f4ef;
-    border-radius: 20px;
-    padding: 18px;
-    margin-bottom: 22px;
-  }
-  .settings-title {
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-  .settings-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .settings-row label {
-    margin: 0;
-    font-size: 13px;
-    text-transform: none;
-    letter-spacing: 0;
-    color: var(--text);
-    flex: 1;
-    font-weight: 700;
-  }
-  .settings-row input {
-    width: 90px;
-    padding: 10px 12px;
-    font-size: 20px;
-    border-radius: 12px;
-    flex: none;
-  }
-  .saved-badge {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--green);
-    opacity: 0;
-    transition: opacity 0.3s;
-    white-space: nowrap;
-  }
-  .saved-badge.show { opacity: 1; }
+/* PORTION box — portion per scoop (z), shown big blue */
+.portion-box {
+  margin-top: 22px;
+  background: var(--blue-light);
+  border-radius: 20px;
+  padding: 22px 20px;
+  text-align: center;
+  border: 2.5px solid #a8d4f5;
+  display: none;
+  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.portion-box.show { display: block; }
+.portion-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--blue); margin-bottom: 4px; }
+.portion-sublabel { font-size: 11px; font-weight: 600; color: #7aabda; margin-bottom: 8px; }
+.portion-number { font-family: 'Fredoka One', cursive; font-size: 64px; color: #1a5fa8; line-height: 1; }
+.portion-unit { font-size: 14px; font-weight: 700; color: var(--blue); margin-top: 4px; }
+
+/* AFTER 1ST SCOOP box (z2) — same size as green, red */
+.scoop1-box {
+  margin-top: 12px;
+  background: #fff0f0;
+  border-radius: 20px;
+  padding: 22px 20px;
+  text-align: center;
+  border: 2.5px solid #ffb3b3;
+  display: none;
+  animation: popIn 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+.scoop1-box.show { display: block; }
+.scoop1-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: #e03030; margin-bottom: 4px; }
+.scoop1-sub { font-size: 11px; font-weight: 600; color: #e07070; margin-bottom: 8px; }
+.scoop1-number { font-family: 'Fredoka One', cursive; font-size: 56px; color: #c0392b; line-height: 1; }
+.scoop1-unit { font-size: 14px; font-weight: 700; color: #e03030; margin-top: 4px; }
+
+/* AFTER 2ND SCOOP box (z3) — big green, final answer */
+.result-box {
+  margin-top: 12px;
+  background: var(--green-light);
+  border-radius: 20px;
+  padding: 22px 20px;
+  text-align: center;
+  border: 2.5px solid #b8e8cc;
+  display: none;
+  animation: popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.result-box.show { display: block; }
+.result-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: var(--green); margin-bottom: 4px; }
+.result-sublabel { font-size: 11px; font-weight: 600; color: #7abf9a; margin-bottom: 8px; }
+.result-number { font-family: 'Fredoka One', cursive; font-size: 56px; color: #2e7d52; line-height: 1; }
+.result-unit { font-size: 14px; font-weight: 700; color: var(--green); margin-top: 4px; }
+
+.steps { margin-top: 18px; background: #f9f4ef; border-radius: 16px; padding: 16px; display: none; }
+.steps.show { display: block; }
+.steps-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+.step { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px dashed #e8d8c8; font-size: 14px; color: var(--text); font-weight: 600; }
+.step:last-child { border-bottom: none; }
+.step .val { font-family: 'Fredoka One', cursive; font-size: 16px; color: var(--orange-dark); }
+.step.highlight { background: var(--blue-light); border-radius: 10px; padding: 8px 10px; margin: 2px -4px; border-bottom: none; }
+.step.highlight .val { color: #1a5fa8; font-size: 18px; }
+.step.highlight span:first-child { color: #1a5fa8; font-weight: 800; }
+
+.divider { height: 1px; background: #f0e4d8; margin: 22px 0; }
+.equation-info { text-align: center; font-size: 12px; color: var(--muted); font-weight: 600; line-height: 1.6; }
+.eq-chip { display: inline-block; background: var(--orange-light); border-radius: 8px; padding: 3px 10px; font-family: 'Fredoka One', cursive; font-size: 14px; color: var(--orange-dark); margin-top: 5px; }
+.error-box { margin-top: 14px; background: #fff0f0; border: 2px solid #ffc0c0; border-radius: 14px; padding: 12px 16px; color: #c0392b; font-size: 13px; font-weight: 700; text-align: center; display: none; }
+.error-box.show { display: block; }
+
+/* Settings */
+.settings {
+  background: #f9f4ef;
+  border-radius: 20px;
+  padding: 18px;
+  margin-bottom: 22px;
+}
+.settings-title {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.settings-row label {
+  margin: 0;
+  font-size: 13px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+  flex: 1;
+  font-weight: 700;
+}
+.settings-row input {
+  width: 90px;
+  padding: 10px 12px;
+  font-size: 20px;
+  border-radius: 12px;
+  flex: none;
+}
+.saved-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green);
+  opacity: 0;
+  transition: opacity 0.3s;
+  white-space: nowrap;
+}
+.saved-badge.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -171,12 +219,11 @@
     <p>Daily portion helper</p>
   </div>
   <div class="body">
-
     <div class="settings">
       <div class="settings-title">⚙️ Settings</div>
       <div class="settings-row">
-        <label for="yInput">Y value (currently <span id="yDisplay">29</span>)</label>
-        <input type="number" id="yInput" placeholder="29" inputmode="numeric">
+        <label for="yInput">Y value (currently <span id="yDisplay">28</span>)</label>
+        <input type="number" id="yInput" placeholder="28" inputmode="numeric">
         <span class="saved-badge" id="savedBadge">✅ Saved!</span>
       </div>
     </div>
@@ -186,20 +233,42 @@
       <input type="number" id="xInput" placeholder="e.g. 300" inputmode="numeric" min="1" max="9999">
       <button class="calc" onclick="calculate()" title="Calculate">🐱</button>
     </div>
+
     <div class="error-box" id="errorBox">⚠️ Enter a number bigger than your Y value</div>
+
+    <!-- z = portion per scoop (BIG blue) -->
+    <div class="portion-box" id="portionBox">
+      <div class="portion-label">🍽️ Each portion is</div>
+      <div class="portion-sublabel">(X − Y) ÷ 3</div>
+      <div class="portion-number" id="portionNum">—</div>
+      <div class="portion-unit">grams per scoop</div>
+    </div>
+
+    <!-- z2 = remaining after 1st scoop (big red) -->
+    <div class="scoop1-box" id="scoop1Box">
+      <div class="scoop1-label">🥣 After 1st scoop</div>
+      <div class="scoop1-sub">still on plate</div>
+      <div class="scoop1-number" id="scoop1Num">—</div>
+      <div class="scoop1-unit">grams</div>
+    </div>
+
+    <!-- z3 = remaining after 2nd scoop (BIG green) -->
     <div class="result-box" id="resultBox">
-      <div class="result-label">✅ Give your cat</div>
+      <div class="result-label">✅ After 2nd scoop</div>
+      <div class="result-sublabel">remaining on plate (= 3rd portion)</div>
       <div class="result-number" id="resultNum">—</div>
       <div class="result-unit">grams</div>
     </div>
+
     <div class="steps" id="stepsBox">
       <div class="steps-title">🔢 How it was calculated</div>
       <div class="step"><span>Starting amount (X)</span><span class="val" id="s0">—</span></div>
       <div class="step"><span>X − Y</span><span class="val" id="s1">—</span></div>
-      <div class="step"><span>÷ 3 (portion to subtract)</span><span class="val" id="s2">—</span></div>
-      <div class="step"><span>X − portion</span><span class="val" id="s3">—</span></div>
-      <div class="step"><span>− portion again</span><span class="val" id="s4">—</span></div>
+      <div class="step highlight"><span>÷ 3 → portion per scoop</span><span class="val" id="s2">—</span></div>
+      <div class="step"><span>After 1st scoop (X − portion)</span><span class="val" style="color:#c0392b" id="s3">—</span></div>
+      <div class="step"><span>After 2nd scoop (− portion)</span><span class="val" style="color:#2e7d52" id="s4">—</span></div>
     </div>
+
     <div class="divider"></div>
     <div class="equation-info">
       Using your equation<br>
@@ -207,58 +276,71 @@
     </div>
   </div>
 </div>
+
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
+let Y = parseFloat(localStorage.getItem('catcalc_y')) || 28;
+document.getElementById('yInput').value = Y;
+document.getElementById('yDisplay').textContent = Y;
+
+document.getElementById('yInput').addEventListener('change', () => {
+  const val = parseFloat(document.getElementById('yInput').value);
+  if (!isNaN(val) && val > 0) {
+    Y = val;
+    localStorage.setItem('catcalc_y', Y);
+    document.getElementById('yDisplay').textContent = Y;
+    const badge = document.getElementById('savedBadge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 2000);
   }
+});
 
-  // Load saved Y on startup
-  let Y = parseFloat(localStorage.getItem('catcalc_y')) || 29;
-  document.getElementById('yInput').value = Y;
-  document.getElementById('yDisplay').textContent = Y;
+document.getElementById('xInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') calculate();
+});
 
-  // Save Y when changed
-  document.getElementById('yInput').addEventListener('change', () => {
-    const val = parseFloat(document.getElementById('yInput').value);
-    if (!isNaN(val) && val > 0) {
-      Y = val;
-      localStorage.setItem('catcalc_y', Y);
-      document.getElementById('yDisplay').textContent = Y;
-      const badge = document.getElementById('savedBadge');
-      badge.classList.add('show');
-      setTimeout(() => badge.classList.remove('show'), 2000);
-    }
-  });
+function fmt(n) { return Number.isInteger(n) ? n : n.toFixed(2); }
 
-  document.getElementById('xInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') calculate();
-  });
+function calculate() {
+  const X = parseFloat(document.getElementById('xInput').value);
+  const errorBox = document.getElementById('errorBox');
+  const portionBox = document.getElementById('portionBox');
+  const scoop1Box = document.getElementById('scoop1Box');
+  const resultBox = document.getElementById('resultBox');
+  const stepsBox = document.getElementById('stepsBox');
 
-  function fmt(n) { return Number.isInteger(n) ? n : n.toFixed(2); }
+  errorBox.classList.remove('show');
+  portionBox.classList.remove('show');
+  scoop1Box.classList.remove('show');
+  resultBox.classList.remove('show');
+  stepsBox.classList.remove('show');
 
-  function calculate() {
-    const X = parseFloat(document.getElementById('xInput').value);
-    const errorBox = document.getElementById('errorBox');
-    const resultBox = document.getElementById('resultBox');
-    const stepsBox = document.getElementById('stepsBox');
-    errorBox.classList.remove('show');
-    resultBox.classList.remove('show');
-    stepsBox.classList.remove('show');
-    if (isNaN(X) || X <= Y) { errorBox.classList.add('show'); return; }
-    const step1 = X - Y;
-    const step2 = step1 / 3;
-    const step3 = X - step2;
-    const step4 = step3 - step2;
-    document.getElementById('s0').textContent = fmt(X) + 'g';
-    document.getElementById('s1').textContent = fmt(step1);
-    document.getElementById('s2').textContent = fmt(step2);
-    document.getElementById('s3').textContent = fmt(step3);
-    document.getElementById('s4').textContent = fmt(step4) + 'g ✓';
-    document.getElementById('resultNum').textContent = fmt(step4);
-    void resultBox.offsetWidth;
-    resultBox.classList.add('show');
-    stepsBox.classList.add('show');
-  }
+  if (isNaN(X) || X <= Y) { errorBox.classList.add('show'); return; }
+
+  const b    = X - Y;
+  const z    = b / 3;
+  const z2   = X - z;
+  const z3   = z2 - z;
+
+  document.getElementById('s0').textContent = fmt(X) + 'g';
+  document.getElementById('s1').textContent = fmt(b);
+  document.getElementById('s2').textContent = fmt(z);
+  document.getElementById('s3').textContent = fmt(z2) + 'g';
+  document.getElementById('s4').textContent = fmt(z3) + 'g ✓';
+
+  document.getElementById('portionNum').textContent = fmt(z);
+  document.getElementById('scoop1Num').textContent = fmt(z2);
+  document.getElementById('resultNum').textContent = fmt(z3);
+
+  void portionBox.offsetWidth;
+  portionBox.classList.add('show');
+  scoop1Box.classList.add('show');
+  resultBox.classList.add('show');
+  stepsBox.classList.add('show');
+}
 </script>
 </body>
 </html>
